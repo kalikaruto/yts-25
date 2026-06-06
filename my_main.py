@@ -198,4 +198,12 @@ if window_state == WINDOW_UNKNOWN:
 while True:
     try:
         temp = temperature.read()
-        lumin = lux.rea
+        lumin = lux.read_lux()
+
+        logic(temp, lumin)
+
+    except Exception as e:
+        print("Sensor error:", e)
+    
+    time.sleep(1)
+
