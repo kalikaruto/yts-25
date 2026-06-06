@@ -32,6 +32,7 @@ CLOSE_THRESHOLD = 1700
 WINDOW_OPEN = 1
 WINDOW_CLOSED = 0
 WINDOW_UNKNOWN = -1
+window_state = WINDOW_CLOSED
 
 LOG_FILE = "readings.csv"
 log_counter = 0
@@ -51,7 +52,6 @@ def log_readings(temp, lumin):
     if log_counter < 5:
         return
     log_counter = 0
-    print(f"window is { 'CLOSED' if window_state==WINDOW_CLOSED else 'OPEN'}")
     ts = get_local_time()
 
     with open(LOG_FILE, "a") as f:
@@ -62,15 +62,21 @@ def log_readings(temp, lumin):
         ))
 
 def logic(temp, lumin):
-    global window_state, log_counter
+    global log_counter, window_state
 
-    print(f"Temperature: {temp:.2f} C\tLux: {lumin:.2f}")
+    print(f"{get_local_time()} >>\tTemperature: {temp:.2f} C\tLux: {lumin:.2f}")
 
-    if lumin < OPEN_THRESHOLD:
+    if lumin < OPEN_THRESHOLD and window_state != WINDOW_CLOSED:
         print("OPENING WINDOW")
+        window_state = WINDOW_CLOSED
+        time.sleep(1)
+        print("WINDOW OPENED")
 
-    if lumin > CLOSE_THRESHOLD:
+    if lumin > CLOSE_THRESHOLD and window_state != WINDOW_OPEN:
         print("CLOSING WINDOW")
+        window_state = WINDOW_OPEN
+        time.sleep(1)
+        print("WINDOW CLOSED")
 
     log_counter+=1
     log_readings(temp, lumin)
@@ -94,4 +100,3 @@ while True:
         print("Sensor error:", e)
     
     time.sleep(1)
-
